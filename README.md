@@ -1,5 +1,5 @@
 # Allstar-AsteriskX-Full
-Allstar-AsteriskX-Full deb packages for amd64 architecture
+Allstar Asterisk Xtended DEB packages with features inspired from HamVoIP for the amd64 architecture
 * Supported on Debian 11, 12, and above
 * Single installation script
 
