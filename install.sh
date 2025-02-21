@@ -6,6 +6,7 @@ DAHDI_DKMS="allstar-dahdi-linux-dkms_3.4.0.20250220-1_all.deb"
 DAHDI_TOOLS="allstar-dahdi-linux-tools_3.4.0.20250220-1_amd64.deb"
 N_DAHDI_DKMS="allstar-dahdi-linux-dkms"
 N_DAHDI_TOOLS="allstar-dahdi-linux-tools"
+ASL_DEB=""
 
 check_root() {
     if [ "$EUID" -ne 0 ]; then
@@ -44,7 +45,7 @@ determine_packages() {
             LIBIDN_PACKAGE="libidn11"
             ASL_DEB="allstar-asteriskX-full_1.02X-20250218-1_debian11_amd64.deb"
             ;;
-        12|13)
+        12|13|2024)
             LIBCOMERR_PACKAGE="libcom-err2"
             LIBGCC1_PACKAGE="libgcc-s1"
             LIBIDN_PACKAGE="libidn12"
@@ -87,10 +88,10 @@ install_dahdi() {
 }
 
 uninstall_dahdi() {
-    if lsmod | grep -q "dahdi_dummy"; then modprobe -r dahdi_dummy; fi
-    if lsmod | grep -q "dahdi"; then modprobe -r dahdi; fi
-    if dpkg -l | grep -q "$N_DAHDI_TOOLS"; then dpkg -P "$N_DAHDI_TOOLS"; fi
-    if dpkg -l | grep -q "$N_DAHDI_DKMS"; then dpkg -P "$N_DAHDI_DKMS"; fi
+    if lsmod | grep -w "dahdi_dummy" > /dev/null; then modprobe -r dahdi_dummy; fi
+    if lsmod | grep -w "dahdi" > /dev/null; then modprobe -r dahdi; fi
+    if dpkg -l | grep -w "$N_DAHDI_TOOLS" > /dev/null; then dpkg -P "$N_DAHDI_TOOLS"; fi
+    if dpkg -l | grep -w "$N_DAHDI_DKMS" > /dev/null; then dpkg -P "$N_DAHDI_DKMS"; fi
 }
 
 install_asl() {
@@ -98,15 +99,15 @@ install_asl() {
 }
 
 uninstall_asl() {
-    if systemctl list-units --type=service --all | grep -q "asterisk.service"; then
+    if systemctl list-units --type=service --all | grep -w "asterisk.service" > /dev/null; then
         systemctl stop asterisk
         systemctl disable asterisk
     fi
     if [ -f /usr/local/sbin/astdn.sh ]; then
         /usr/local/sbin/astdn.sh
     fi
-    for package in allstar allstar-asterisk-full allstar-asteriskX-full; do
-        if dpkg -l | grep -q "^ii  $package"; then
+    for package in allstar allstar-asterisk-full allstar-asteriskx-full; do
+        if dpkg-query -W -f='${binary:Package}\n' | grep -w "^$package$" > /dev/null; then
             dpkg -P "$package"
         fi
     done
