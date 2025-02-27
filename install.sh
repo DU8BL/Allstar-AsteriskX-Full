@@ -88,9 +88,6 @@ check_installed_version() {
     local installed_version
     installed_version=$(dpkg-query -W -f='${Version}\n' allstar-asteriskx-full 2>/dev/null || echo "not installed")
 
-    echo $deb_version
-    echo $installed_version
-
     if [ "$installed_version" == "not installed" ]; then
         echo "First time installation of allstarlink-asteriskx-full."
     else
