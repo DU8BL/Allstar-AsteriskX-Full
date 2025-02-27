@@ -43,13 +43,13 @@ determine_packages() {
             LIBCOMERR_PACKAGE="libcomerr2"
             LIBGCC1_PACKAGE="libgcc1"
             LIBIDN_PACKAGE="libidn11"
-            ASL_DEB="allstar-asteriskX-full_1.02X-20250218-1_debian11_amd64.deb"
+            ASL_DEB="allstar-asteriskX-full_1.02X-20250227-2_debian11_amd64.deb"
             ;;
-        12|13|2024)
+        12|13)
             LIBCOMERR_PACKAGE="libcom-err2"
             LIBGCC1_PACKAGE="libgcc-s1"
             LIBIDN_PACKAGE="libidn12"
-            ASL_DEB="allstar-asteriskX-full_1.02X-20250218-1_debian12_amd64.deb"
+            ASL_DEB="allstar-asteriskX-full_1.02X-20250227-2_debian12_amd64.deb"
             ;;
         *)
             echo "Unsupported Debian version. Exiting."
@@ -68,7 +68,7 @@ install_dependencies() {
         $LIBIDN_PACKAGE libiksemel3 libncurses5 libnewt0.52 libogg0 \
         libpopt0 libpri1.4 libspeex1 libstdc++6 libtonezone-dev \
         libusb-0.1-4 libusb-1.0-0 libvorbis0a libvorbisenc2 libwrap0 \
-        linux-headers-$(uname -r) perl procps usbutils wget zlib1g
+        linux-headers-$(uname -r) perl procps python3-iniparse usbutils wget zlib1g
 }
 
 download_deb_files() {
@@ -81,10 +81,49 @@ download_deb_files() {
     done
 }
 
+check_installed_version() {
+    local deb_version
+    deb_version=$(echo "$ASL_DEB" | awk -F'_' '{print $2}')
+
+    local installed_version
+    installed_version=$(dpkg-query -W -f='${Version}\n' allstar-asteriskx-full 2>/dev/null || echo "not installed")
+
+    echo $deb_version
+    echo $installed_version
+
+    if [ "$installed_version" == "not installed" ]; then
+        echo "First time installation of allstarlink-asteriskx-full."
+    else
+        if dpkg --compare-versions "$installed_version" ge "$deb_version"; then
+            echo "Already up to date. Skipping installation."
+            exit 1
+        fi
+    fi
+}
+
+backup_asl() {
+    if [ -d /etc/asterisk ]; then
+        current_time=$(date "+%Y-%m-%d_%H-%M-%S")
+        backup_name="asterisk-$current_time"
+        echo "Backing up your old Asterisk folder to $backup_name"
+        mv -f /etc/asterisk "/etc/$backup_name"
+    else
+        echo "No existing asterisk folder found, skipping backup."
+    fi
+}
+
 install_dahdi() {
-    dpkg -i "$DAHDI_DKMS" "$DAHDI_TOOLS"
+    dpkg -i "$DAHDI_DKMS" "$DAHDI_TOOLS" || { echo "Failed to install DAHDI packages."; exit 1; }
     modprobe dahdi || { echo "Failed to load DAHDI module."; exit 1; }
     modprobe dahdi_dummy || { echo "Failed to load DAHDI dummy module."; exit 1; }
+    if ! lsmod | grep -w "dahdi" > /dev/null; then
+        echo "DAHDI module not found, failed to load.";
+        exit 1;
+    fi
+    if ! lsmod | grep -w "dahdi_dummy" > /dev/null; then
+        echo "DAHDI dummy module not found, failed to load.";
+        exit 1;
+    fi
 }
 
 uninstall_dahdi() {
@@ -95,7 +134,7 @@ uninstall_dahdi() {
 }
 
 install_asl() {
-    dpkg -i $ASL_DEB
+    dpkg -i $ASL_DEB || { echo "Failed to install AllStarLink packages."; exit 1; }
 }
 
 uninstall_asl() {
@@ -121,10 +160,11 @@ trap cleanup_files EXIT
 
 check_root
 confirm_installation
-
-echo "Starting installation process."
 detect_debian_version
 determine_packages
+check_installed_version
+
+echo "Starting installation process."
 
 echo "Updating the System."
 update_system
@@ -136,6 +176,7 @@ echo "Downloading required deb packages."
 download_deb_files
 
 echo "Removing any existing Dahdi and Allstarlink installations."
+backup_asl
 uninstall_asl
 uninstall_dahdi
 
@@ -147,3 +188,5 @@ echo "Cleaning up downloaded files."
 cleanup_files
 
 echo "Installation completed successfully."
+
+/usr/local/sbin/asl-menu
