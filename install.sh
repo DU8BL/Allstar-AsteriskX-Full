@@ -68,7 +68,8 @@ install_dependencies() {
         $LIBIDN_PACKAGE libiksemel3 libncurses5 libnewt0.52 libogg0 \
         libpopt0 libpri1.4 libspeex1 libstdc++6 libtonezone-dev \
         libusb-0.1-4 libusb-1.0-0 libvorbis0a libvorbisenc2 libwrap0 \
-        linux-headers-$(uname -r) perl procps python3-iniparse usbutils wget zlib1g
+        linux-headers-$(uname -r) perl procps python3-iniparse python-is-python3 \
+        usbutils wget zlib1g
 }
 
 download_deb_files() {
