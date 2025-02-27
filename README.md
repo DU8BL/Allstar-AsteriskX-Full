@@ -35,7 +35,7 @@ NOTE: This will remove any existing AllStarLink and DAHDI installations. Make su
 * To install the Allstar-AsteriskX-Full packages on Debian, follow these steps (must be run as ROOT):
 
 <pre>
-wget https://raw.githubusercontent.com/DU8BL/Allstar-AsteriskX-Full/main/install.sh
+wget -O install.sh https://raw.githubusercontent.com/DU8BL/Allstar-AsteriskX-Full/main/install.sh
 chmod +x install.sh
 ./install.sh
 </pre>
