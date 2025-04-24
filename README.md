@@ -1,6 +1,6 @@
 # Allstar-AsteriskX-Full
 Allstar Asterisk Xtended DEB packages with features inspired by HamVoIP for the amd64 architecture
-* Supported on Debian 11, 12, and newer versions
+* Supported on Debian 12 and newer versions
 * Install using the provided installation script
 * DAHDI version 3.4.0
 
@@ -17,7 +17,7 @@ NOTE: This will remove any existing AllStarLink and DAHDI installations. Make su
 ### Compatibility:
 
 * The DAHDI package is compatible with kernel version 6.X and above.
-* The package may also work with other Linux distributions, though it is primarily tested on Debian 11, 12, and newer versions.
+* The package may also work with other Linux distributions, though it is primarily tested on Debian 12 and newer versions.
 
 ### Submitting Issues:
 
@@ -46,6 +46,12 @@ chmod +x install.sh
 service start asterisk
 service stop asterisk
 service reload asterisk
+</pre>
+
+* ASl Menu Command:
+
+<pre>
+asl-menu
 </pre>
 
 -----------------------------------------------------------

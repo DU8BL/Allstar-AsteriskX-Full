@@ -39,17 +39,11 @@ detect_debian_version() {
 
 determine_packages() {
     case "$DEBIAN_VERSION" in
-        10|11)
-            LIBCOMERR_PACKAGE="libcomerr2"
-            LIBGCC1_PACKAGE="libgcc1"
-            LIBIDN_PACKAGE="libidn11"
-            ASL_DEB="allstar-asteriskX-full_1.02X-20250227-2_debian11_amd64.deb"
-            ;;
         12|13)
             LIBCOMERR_PACKAGE="libcom-err2"
             LIBGCC1_PACKAGE="libgcc-s1"
             LIBIDN_PACKAGE="libidn12"
-            ASL_DEB="allstar-asteriskX-full_1.02X-20250227-2_debian12_amd64.deb"
+            ASL_DEB="allstar-asteriskX-full_1.02X-20250424-3_debian12_amd64.deb"
             ;;
         *)
             echo "Unsupported Debian version. Exiting."
